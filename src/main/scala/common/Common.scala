@@ -3,7 +3,7 @@ package common
 import scala.annotation.tailrec
 
 object Common {
-	def factorials =
+	def allFactorials =
 		List(
 			10000,
 			20000,
@@ -35,9 +35,11 @@ object Common {
 		}
 	}
 
-	def start() = Benchmark()
+	def start = Benchmark()
 
-	def left(size: Int) = println(s"Left to calculate: ${size}")
+	def progress(left: Int) = println(s"Left to calculate: ${left}")
+
+	def displaySum(sum: BigInt) = println(s"Final sum is ${sum.bitLength} bits long")
 }
 
 case class Benchmark {

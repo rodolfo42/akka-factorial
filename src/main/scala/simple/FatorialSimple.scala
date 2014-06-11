@@ -1,19 +1,20 @@
 package simple
 
-import common._
+import common.Common._
 
 object Factorial extends App {
-  val factorials = Common.factorials
+  val factorials = allFactorials
   var size = factorials.size
+  var sum = BigInt(0)
 
-  val benchmark = Common.start
+  val bench = start
 
   for (num <- factorials) {
-      Common.factor(num)
-
+      sum = factor(num) + sum
       size -= 1
-      Common.left(size)
+      progress(size)
   }
 
-  benchmark.stop
+  bench.stop
+  displaySum(sum)
 }

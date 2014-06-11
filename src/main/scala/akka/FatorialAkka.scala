@@ -1,20 +1,22 @@
 package akka
 
-import common._
+import common.Common._
+import common.Benchmark
 
 import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
 
 object Factorial extends App {
-  val factorials = Common.factorials
-  val benchmark = Common.start
+  val factorials = allFactorials
+  val bench = start
 
   val system = ActorSystem("factorial")
 
-  val collector = system.actorOf(Props(new FactorialCollector(factorials, benchmark)), "collector")
+  val collector = system.actorOf(Props(new FactorialCollector(factorials, bench)), "collector")
 }
 
-class FactorialCollector(factorials: List[Int], benchmark: Benchmark) extends Actor with ActorLogging {
+class FactorialCollector(factorials: List[Int], bench: Benchmark) extends Actor with ActorLogging {
   var size = factorials.size
+  var sum = BigInt(0)
 
   for (num <- factorials) {
     context.actorOf(Props(new FactorialCalculator)) ! num
@@ -22,11 +24,13 @@ class FactorialCollector(factorials: List[Int], benchmark: Benchmark) extends Ac
 
   def receive = {
     case (num: Int, fac: BigInt) => {
+      sum = sum + fac
       size -= 1
-      Common.left(size)
+      progress(size)
 
       if (size == 0) {
-        benchmark.stop
+        bench.stop
+        displaySum(sum)
         context.system.shutdown()
       }
     }
@@ -35,6 +39,6 @@ class FactorialCollector(factorials: List[Int], benchmark: Benchmark) extends Ac
 
 class FactorialCalculator extends Actor {
   def receive = {
-    case num: Int => sender ! (num, Common.factor(num))
+    case num: Int => sender ! (num, factor(num))
   }
 }
